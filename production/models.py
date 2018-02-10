@@ -12,7 +12,7 @@ class Line(models.Model):
 
 class Machine(models.Model):
 	MachineCode=models.CharField(max_length=10)
-	FromLine=models.ForeignKey('Line',on_delete=models.CASCADE)
+	LineCode=models.ForeignKey('Line',on_delete=models.CASCADE,related_name="Machine",verbose_name = u'Line')
 
 	def __str__(self):
 		return self.MachineCode
@@ -21,11 +21,8 @@ class Machine(models.Model):
 
 class Product(models.Model):
 	ProductCode=models.CharField(max_length=20)
-	FromMachine=models.ForeignKey('Machine',on_delete=models.CASCADE)
+	MachineCode=models.ForeignKey('Machine',on_delete=models.CASCADE,related_name="Product",verbose_name = u'Machine',null = True, blank = True)
 	ProductCT=models.CharField(max_length=20,default=1)
-	Product_OEE=models.FloatField(max_length=10,default=0)
-	Product_OEELoss=models.FloatField(max_length=10,default=0)
-	Product_Yield=models.FloatField(max_length=10,default=0)
 
 	def __str__(self):
 		return self.ProductCode
@@ -33,15 +30,23 @@ class Product(models.Model):
 		ordering=['-ProductCode']
 
 class Operation(models.Model):
-	OptDateTime=models.DateTimeField(auto_now_add=True, blank=True)
-	OptLine=models.ForeignKey('Line',on_delete=models.CASCADE,default=1)
-	OptMachine=models.ForeignKey('Machine',on_delete=models.CASCADE,default=11)
-	OptProductCode=models.CharField(max_length=20,default=0)
-	OptConsum=models.CharField(max_length=20)
-	OptGood=models.CharField(max_length=20)
-	OptScraps=models.CharField(max_length=20)
-	OptDownTime=models.CharField(max_length=20,default=0)
-	OptDuration=models.CharField(max_length=20)
+	LineCode=models.ForeignKey('Line',null = True, blank = True,related_name="Operation",verbose_name = u'Line')
+	MachineCode=models.ForeignKey('Machine',null = True, blank = True,related_name="Operation",verbose_name = u'Machine')
+	ProductCode = models.ForeignKey('Product', null = True, blank = True,related_name="Operation",verbose_name = u'Product')
+	DateTime=models.DateTimeField(auto_now_add=False, blank=True) 
+	Consum=models.CharField(max_length=20)
+	Good=models.CharField(max_length=20)
+	Scraps=models.CharField(max_length=20)
+	Duration=models.CharField(max_length=20)
+	DownTime=models.CharField(max_length=20,null = True, blank = True,)
 
 	class Meta:
-		ordering=['-OptDateTime']
+		ordering=['-DateTime']
+
+#creat ModelForm
+class OperationForm(ModelForm):
+	class Meta:
+		model=Operation
+		#fields='__all__'
+		fields=('LineCode', 'MachineCode', 'ProductCode')
+
