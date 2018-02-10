@@ -1,0 +1,14 @@
+{% block content %}  
+<h1>修改资料</h1>  
+{% if form.errors %}  
+<p class="errors">请修改下面的错误: {{ form.non_field_errors }}</p>  
+{% endif %}  
+<form method="post" action="" enctype="multipart/form-data">  
+<table>  
+    {{form}}  
+</table>  
+{%load trade_tags%}  
+{{cascade_select_list|cascade_select}}  
+<p class="submit"><input type="submit" value="修改"></p>  
+</form>  
+{% endblock %} 
