@@ -1,0 +1,67 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SinoRPC</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
+    <link href="{% static "highchart/code/css/highcharts.css" %}" rel="stylesheet">
+    <!-- Custom CSS -->
+	<!--     <link href="{% static "css/heroic-features.css" %}" rel="stylesheet"> -->
+	    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	    <!--[if lt IE 9]>
+	        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+	        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	    <![endif]-->
+	<style type="text/css">
+		body{  
+		  min-height: 100%;//最底高度为页面的100%高度
+
+		}
+		footer{
+			position:absolute;  
+			bottom: 0;  
+			width: 100%;  
+			clear: both;//清除浮动  
+			line-height: 30px;   
+			}
+		.tophead{
+			height: 65px;
+			width: 100%;
+			position: fixed;
+			top: 0;
+		}
+		.main{
+			width: 100%;
+			position: fixed;
+			top: 80px;
+		}  
+	</style>
+</head>
+<body>
+	<div align="center" class="tophead" style="background-color: #4682B4; color:white"><h3>Welcome to SinoRPC</h3></div><p></p>
+	<div class="row ">{% block title %}{% endblock %}</div>
+	<div class="row main" style="">{% block content %}{% endblock %}</div>
+	<!-- Js -->
+	    <script src="{% static "js/jquery.js" %}"></script>
+	    <!-- Bootstrap Core JavaScript -->
+	    <script src="{% static "js/bootstrap.min.js" %}"></script>
+	    <!-- Highcharts -->
+	    <script src="{% static "highchart/code/js/highcharts.js" %}"></script>
+	<footer>
+		<div align="center" style="background-color: #4682B4;">
+			<hr>&copy; Copyright 2018 ShiMenIT
+		</div>
+
+	</footer>
+</body>
+</html>
