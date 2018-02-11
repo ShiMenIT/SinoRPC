@@ -33,18 +33,20 @@ def upload(request):
 @csrf_exempt
 def cal(request):
     if request.method=='POST':
-        form=RegistrationForm(request.POST)
-        result=0 
+        form = OperationForm(request.POST)
         if form.is_valid():
-            result=1
             Line = form.cleaned_data['LineCode']
             Machine = form.cleaned_data['MachineCode']
-            Product = form.cleaned_data['ProductCode']
-            result=OEEcal(Line,Machine,Product)
-    return render(request, 'production/index.html',{'result':result,'te':1})
+            StartTime = form.cleaned_data['StartTime']
+            EndTime = form.cleaned_data['EndTime']
+            result=OEEcal(Line,Machine,StartTime,EndTime)
+        else:
+            form =OperationForm()
+            result=''
+    return render(request, 'production/index.html',locals())
 
-def OEEcal(Line,Machine,Product):
-    Lines=Operation.objects.filter(LineCode__LineCode=Line,MachineCode__MachineCode=Machine,ProductCode__ProductCode=Product)
+def OEEcal(Line,Machine,StartTime,EndTime):
+    Lines=Operation.objects.filter(LineCode__LineCode=Line,MachineCode__MachineCode=Machine,StartTime__gte=StartTime,EndTime__lte=EndTime)
     result=[]
     Output=0
     HU=0
@@ -59,7 +61,7 @@ def OEEcal(Line,Machine,Product):
 #############################################################
 #send data to JS
 def getLineCode(request):
-    Lines = Line.objects.all()
+    Lines = Line.objects.order_by('LineCode')
     res = []
     for i in Lines:
         res.append( [i.id, i.LineCode] )
@@ -67,17 +69,19 @@ def getLineCode(request):
 
 def getMachineCode(request):
     Line = request.GET.get('LineCode')
-    Machines= Machine.objects.filter(LineCode__LineCode__contains=Line)
+    Machines= Machine.objects.filter(LineCode__LineCode__contains=Line).order_by('MachineCode')
     res = []
     for i in Machines:
         res.append([i.id, i.MachineCode])
     return JsonResponse({'MachineCodes':res},safe=False)
 
-def getProductCode(request):
+def getDateTime(request):
     Machine=request.GET.get('MachineCode')
-    ProductCodes= Operation.objects.filter(MachineCode__MachineCode__contains=Machine)
-    res = []
-    for i in ProductCodes:
-        res.append([i.id, i.ProductCode.ProductCode])
-    return JsonResponse({'ProductCodes': res},safe=False)
+    DateTimes= Operation.objects.filter(MachineCode__MachineCode__contains=Machine).order_by('-StartTime','-EndTime')
+    res1=[]
+    res2=[]
+    for i in DateTimes:
+        res1.append([i.id, i.StartTime])
+        res2.append([i.id, i.EndTime])
+    return JsonResponse({'StartTimes': res1,'EndTimes': res2},safe=False)
 
