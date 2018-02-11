@@ -1,21 +1,18 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<div align="center" class="well col-md-6 col-md-offset-3">
-	<h5>You can query the data here</h5>
+<div align="left" class="col-md-6 col-md-offset-3" style="background-color:#B0C4DE">
+	<h4 align="center"><b>You can query the data here</b></h4>
+	<hr>
 	<form action="{% url 'cal' %}" method="post">{% csrf_token %} 
-<!-- 		{{ form.errors }} 
-	   	{{ form.as_table }} -->
-		<select id="LineCode" >
-			<option value="">Choose Line</option>
-		</select>
-		<select id="MachineCode">
-		    <option value="">Choose Machine</option>
-		</select>
-		<select id="ProductCode">
-		    <option value="">Choose Product</option>
-		</select>
-	<input type="submit" value="确定">
+		{{ form.errors }} 
+	   	{{ form.as_p}}
+<!-- 	   	{% for field in form %}
+            {{ field.errors }}
+            {{ field.label_tag }} {{ field }}
+	    {% endfor %} -->
+	<hr>
+	<input type="submit" value="Submit">
 	</form>	
 </div>
 <div class="well col-md-6 col-md-offset-3">
@@ -28,23 +25,23 @@
 
 <!-- Js part -->
 <script type="text/javascript">
-	$.ajaxSetup({
-    data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
-});
-</script>
-<script type="text/javascript">
 	$(function(){
 		//get line
+		$("#id_LineCode").empty().append('<option value="">Choose Line</option>');
+		$("#id_MachineCode").empty().append('<option value="">Choose Machine</option>');
+		$("#id_StartTime").empty().append('<option value="">Choose StartTime</option>');
+		$("#id_EndTime").empty().append('<option value="">Choose EndTime</option>');
 		$.get('/getLineCode/',function(data){
 		for(var i=0,len=data.LineCodes.length;i<len ;i++){
 		    $new = $("<option value="+data.LineCodes[i][1] +">"+data.LineCodes[i][1]  +"</option>" );
-		    $("#LineCode").append( $new );
+		    $("#id_LineCode").append( $new );
 		}
 		});
 		//after change line
-		$("#LineCode").change(function(){
-			$("#MachineCode").empty().append('<option value="">Choose Line</option>');
-			$("#ProductCode").empty().append('<option value="">Choose Machine</option>');
+		$("#id_LineCode").change(function(){
+			$("#id_MachineCode").empty().append('<option value="">Choose Machine</option>');
+			$("#id_StartTime").empty().append('<option value="">Choose StartTime</option>');
+			$("#id_EndTime").empty().append('<option value="">Choose EndTime</option>');
 			$.ajax({
 			    url:'/getMachineCode/',
 			    type:'get',
@@ -52,21 +49,26 @@
 			}).done(function(data){
 			    for(var i = 0,len = data.MachineCodes.length; i<len ;i++){
 			        $new = $( "<option value="+data.MachineCodes[i][1] +">"+data.MachineCodes[i][1]  +"</option>" );
-			        $("#MachineCode").append( $new );
+			        $("#id_MachineCode").append( $new );
 			    }
 			});
 		});
 		//after change machine
-		$("#MachineCode").change(function(){
-			$("#ProductCode").empty().append('<option value="">Choose Product</option>');
+		$("#id_MachineCode").change(function(){
+			$("#id_StartTime").empty().append('<option value="">Choose StartTime</option>');
+			$("#id_EndTime").empty().append('<option value="">Choose EndTime</option>');
 			$.ajax({
-			    url:'/getProductCode/',
+			    url:'/getDateTime/',
 			    type:'get',
 			    data:{"MachineCode":$(this).val()}
 			}).done(function(data){
-			    for(var i = 0,len = data.ProductCodes.length; i<len ;i++){
-			        $new = $( "<option value="+data.ProductCodes[i][1] +">"+ data.ProductCodes[i][1]+"</option>" );
-			        $("#ProductCode").append($new );
+			    for(var i = 0,len = data.StartTimes.length; i<len ;i++){
+			        $new = $( "<option value="+data.StartTimes[i][1] +">"+ data.StartTimes[i][1]+"</option>" );
+			        $("#id_StartTime").append($new );
+			    }
+			    for(var i = 0,len = data.EndTimes.length; i<len ;i++){
+			        $new = $( "<option value="+data.EndTimes[i][1] +">"+ data.EndTimes[i][1]+"</option>" );
+			        $("#id_EndTime").append($new );
 			    }
 			});
 		});
