@@ -3,16 +3,75 @@
 {% block content %}
 <div align="center" class="well col-md-6 col-md-offset-3">
 	<h5>You can query the data here</h5>
-	<form action="" method="post">   
-	{% csrf_token %} 
-		{{ form.errors }} 
-	   	{{ form.as_table }}
+	<form action="{% url 'cal' %}" method="post">{% csrf_token %} 
+<!-- 		{{ form.errors }} 
+	   	{{ form.as_table }} -->
+		<select id="LineCode" >
+			<option value="">Choose Line</option>
+		</select>
+		<select id="MachineCode">
+		    <option value="">Choose Machine</option>
+		</select>
+		<select id="ProductCode">
+		    <option value="">Choose Product</option>
+		</select>
 	<input type="submit" value="确定">
 	</form>	
+</div>
+<div class="well col-md-6 col-md-offset-3">
+	{{ result}}
 </div>
 <p></p>
 <div align="center" class="col-md-6 col-md-offset-3">
 	<h5>You can upload your data in csv format here <a href="{% url 'upload' %}">upload</a></h5>
 </div>
+
+<!-- Js part -->
+<script type="text/javascript">
+	$.ajaxSetup({
+    data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+});
+</script>
+<script type="text/javascript">
+	$(function(){
+		//get line
+		$.get('/getLineCode/',function(data){
+		for(var i=0,len=data.LineCodes.length;i<len ;i++){
+		    $new = $("<option value="+data.LineCodes[i][1] +">"+data.LineCodes[i][1]  +"</option>" );
+		    $("#LineCode").append( $new );
+		}
+		});
+		//after change line
+		$("#LineCode").change(function(){
+			$("#MachineCode").empty().append('<option value="">Choose Line</option>');
+			$("#ProductCode").empty().append('<option value="">Choose Machine</option>');
+			$.ajax({
+			    url:'/getMachineCode/',
+			    type:'get',
+			    data:{"LineCode":$(this).val()}
+			}).done(function(data){
+			    for(var i = 0,len = data.MachineCodes.length; i<len ;i++){
+			        $new = $( "<option value="+data.MachineCodes[i][1] +">"+data.MachineCodes[i][1]  +"</option>" );
+			        $("#MachineCode").append( $new );
+			    }
+			});
+		});
+		//after change machine
+		$("#MachineCode").change(function(){
+			$("#ProductCode").empty().append('<option value="">Choose Product</option>');
+			$.ajax({
+			    url:'/getProductCode/',
+			    type:'get',
+			    data:{"MachineCode":$(this).val()}
+			}).done(function(data){
+			    for(var i = 0,len = data.ProductCodes.length; i<len ;i++){
+			        $new = $( "<option value="+data.ProductCodes[i][1] +">"+ data.ProductCodes[i][1]+"</option>" );
+			        $("#ProductCode").append($new );
+			    }
+			});
+		});
+
+		})
+</script>
 
 {% endblock %}
